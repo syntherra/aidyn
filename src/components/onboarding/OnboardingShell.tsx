@@ -3,7 +3,7 @@ import styles from "./OnboardingShell.module.scss";
 import Button from "../ui/Button";
 import { streamChat, chatOnce } from "../../ai/deepseek";
 import { evaluateAnswer, nextPrompt } from "../../onboarding/scoring";
-import { updateOnboarding, logApp, appendConversation } from "../../firebase";
+import { updateOnboarding, logApp, updateOnboardingStage, startOnboardingSession, setActiveSession, observeSessionMessages, appendSessionMessage } from "../../firebase";
 
 type StageKey = "identity" | "product" | "audience" | "positioning" | "sales" | "voice";
 const STAGES: StageKey[] = ["identity", "product", "audience", "positioning", "sales", "voice"];
@@ -23,6 +23,7 @@ const OnboardingShell = ({ userId, onboarding }: { userId?: string, onboarding?:
   const [history, setHistory] = useState<{ role: "user" | "assistant"; text: string }[]>([
     { role: "assistant", text: "Welcome to AIDYN. Let’s start with your Business Identity. Tell me your company name, industry and core values." },
   ]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [progress, setProgress] = useState<Record<StageKey, number>>({ identity: 0, product: 0, audience: 0, positioning: 0, sales: 0, voice: 0 });
   const [score, setScore] = useState<number>(0);
   const overall = useMemo(() => Math.round(Object.values(progress).reduce((a, b) => a + b, 0) / STAGES.length), [progress]);
@@ -32,22 +33,39 @@ const OnboardingShell = ({ userId, onboarding }: { userId?: string, onboarding?:
       setProgress((p) => ({ ...p, ...onboarding.progress }));
     }
     if (onboarding?.steps) {
-      // pick next incomplete stage based on progress
       const next = STAGES.find((s) => (onboarding.progress?.[s] ?? 0) < 75) || "voice";
       setStage(next);
     }
-    if (onboarding?.conversation) {
-      const conv = onboarding.conversation as { role: "user" | "assistant"; text: string }[];
-      if (Array.isArray(conv) && conv.length) setHistory(conv);
-    }
     if (typeof onboarding?.score === 'number') setScore(onboarding.score);
-  }, [onboarding]);
+    if (userId) {
+      const existing = onboarding?.activeSessionId as string | undefined;
+      if (existing) {
+        setSessionId(existing);
+      } else {
+        (async () => {
+          const sid = await startOnboardingSession(userId);
+          if (sid) {
+            setSessionId(sid);
+            await setActiveSession(userId, sid);
+          }
+        })();
+      }
+    }
+  }, [onboarding, userId]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    const off = observeSessionMessages(sessionId, (items) => {
+      if (items && items.length) setHistory(items.map(m => ({ role: m.role, text: m.text })));
+    });
+    return () => off();
+  }, [sessionId]);
 
   const send = () => {
     if (!message.trim()) return;
     const timestamp = new Date().toISOString();
     setHistory((h) => [...h, { role: "user", text: message }]);
-    if (userId) appendConversation(userId, { role: 'user', text: message, stage, ts: timestamp });
+    if (sessionId) appendSessionMessage(sessionId, { role: 'user', text: message, stage, ts: timestamp });
     const evalRes = evaluateAnswer(stage, message);
     const newScore = Math.max(0, Math.min(100, score + evalRes.relevance - evalRes.deductions + Math.round(evalRes.specificity / 5)));
     setScore(newScore);
@@ -85,7 +103,7 @@ Keep responses concise and actionable. Encourage specificity. If off-topic, gent
             setHistory((h) => [...h, { role: 'assistant', text: reply }])
           }
         }
-        if (userId && buffer.trim()) appendConversation(userId, { role: 'assistant', text: buffer.trim(), stage, ts: new Date().toISOString() })
+        if (sessionId && buffer.trim()) appendSessionMessage(sessionId, { role: 'assistant', text: buffer.trim(), stage, ts: new Date().toISOString() })
         if (bump >= 75) {
           const nextIdx = STAGES.indexOf(stage) + 1;
           if (nextIdx < STAGES.length) {

@@ -175,6 +175,23 @@ export const updateOnboardingStage = async (userId: string, stage: string, bump:
   if (typeof score === 'number') payload['score'] = score
   try { await updateDoc(ref, payload) } catch (e) { await logApp('error', 'onboarding_stage_update_failed', userId, 'onboarding') }
 }
+
+export const setActiveSession = async (userId: string, sessionId: string) => {
+  initFirebase(); if (!db) return
+  const ref = doc(db, 'onboarding', userId)
+  try { await updateDoc(ref, { activeSessionId: sessionId, userId, lastUpdated: serverTimestamp() }) } catch (e) { await logApp('error', 'set_active_session_failed', userId, 'onboarding') }
+}
+
+export const appendSessionMessage = async (sessionId: string, entry: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }) => {
+  initFirebase(); if (!db) return
+  try { await addDoc(collection(db, 'onboarding_sessions', sessionId, 'messages'), entry) } catch (e) { /* suppressed */ }
+}
+
+export const observeSessionMessages = (sessionId: string, cb: (items: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }[]) => void) => {
+  initFirebase(); if (!db) { cb([]); return () => {} }
+  const q = query(collection(db, 'onboarding_sessions', sessionId, 'messages'), orderBy('ts', 'asc'))
+  return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data() as any)))
+}
 export const setAuthPersistenceMode = async (remember: boolean) => {
   initFirebase(); if (!auth) throw new Error('Firebase not initialized')
   await setPersistence(auth, remember ? browserLocalPersistence : browserSessionPersistence)

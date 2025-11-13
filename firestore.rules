@@ -15,6 +15,16 @@ service cloud.firestore {
       allow write: if isOwner(uid) && request.resource.data.userId == request.auth.uid;
     }
 
+    // Per-user onboarding sessions and messages
+    match /onboarding_sessions/{sid} {
+      allow read, write: if isAuthed() && request.resource.data.userId == request.auth.uid;
+
+      match /messages/{mid} {
+        allow create, read: if isAuthed() && get(/databases/$(database)/documents/onboarding_sessions/$(sid)).data.userId == request.auth.uid;
+        allow update, delete: if false;
+      }
+    }
+
     match /user_activities/{doc} {
       allow create: if isAuthed() && request.resource.data.userId == request.auth.uid;
       allow read: if isAuthed() && resource.data.userId == request.auth.uid;
