@@ -1,34 +1,73 @@
-# AIDYN
+# React + TypeScript + Vite
 
-AIDYN is a cloud-based, AI-powered SaaS that acts as an autonomous lead generation and CRM agent for SMBs. It learns your business, discovers and enriches leads, runs fully personalized campaigns, and maintains the CRM — with analytics and governance built in.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-- Stack: `TypeScript`, `React` + `Next.js`, `TailwindCSS`, `Firebase` (Auth, Firestore, Functions, Storage), `BigQuery`, `OpenAI`, `SendGrid`, `Stripe`, `Netlify`, `Sentry`
-- Architecture: Serverless, event-driven modules powered by Firebase Cloud Functions and Firestore; analytics in BigQuery; AI agents on OpenAI APIs
+Currently, two official plugins are available:
 
-## Quick Start
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-1. Prerequisites: `Node.js >= 18`, `pnpm` or `npm`, `Firebase CLI`, `gcloud`, `netlify-cli`
-2. Clone and install: `pnpm install`
-3. Configure Firebase project and emulators
-4. Create local env files and secrets (see `docs/DEVELOPMENT.md`)
-5. Run frontend and backend locally with emulators
+## React Compiler
 
-## Documentation
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-- Overview: `docs/ARCHITECTURE.md`
-- Developer setup: `docs/DEVELOPMENT.md`
-- Deployment & CI/CD: `docs/DEPLOYMENT.md`
-- Security & compliance: `docs/SECURITY.md`
-- Contribution workflow: `docs/CONTRIBUTING.md`
+## Expanding the ESLint configuration
 
-## Modules
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- Onboarding & Strategy
-- Organic Database Growth Engine
-- Campaign Management & Communication
-- CRM & Dynamic Database
-- Analytics & Insights
-- Autonomy, Learning & Governance
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-See details in `docs/ARCHITECTURE.md`.
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```
+
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+```

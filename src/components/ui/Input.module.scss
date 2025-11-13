@@ -1,0 +1,57 @@
+@use "../../styles/tokens.scss" as *;
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  border-radius: $radius-lg;
+  background: $color-gray-100;
+  padding: 10px 16px;
+  height: 60px;
+}
+
+.icon {
+  display: inline-flex;
+  margin-right: 10px;
+  color: $color-text-secondary;
+}
+
+.endIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 10px;
+  color: $color-text-secondary;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-family: $font-family-base;
+  font-size: $font-size-16;
+  color: $color-black;
+  outline: none;
+}
+
+.placeholder {
+  color: $color-text-secondary;
+}
+
+.errorText {
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+  color: #d32f2f;
+}
+
+.error {
+  box-shadow: inset 0 0 0 2px #d32f2f;
+}

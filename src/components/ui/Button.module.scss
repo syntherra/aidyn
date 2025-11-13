@@ -1,0 +1,46 @@
+@use "../../styles/tokens.scss" as *;
+
+.button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: $radius-lg;
+  height: 60px;
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+  will-change: transform, box-shadow;
+}
+
+.primary {
+  background: $color-orange;
+  color: $color-white;
+}
+
+.neutral {
+  background: $color-gray-100;
+  color: $color-black;
+}
+
+.disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.button:hover:not(.disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.button:active:not(.disabled) {
+  transform: translateY(0);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+}
+
+.button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 119, 45, 0.35), 0 6px 16px rgba(0, 0, 0, 0.08);
+}

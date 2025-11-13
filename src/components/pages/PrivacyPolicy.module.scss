@@ -1,0 +1,73 @@
+@use "../../styles/tokens.scss" as *;
+
+.page {
+  display: flex;
+  justify-content: center;
+  padding: clamp(16px, 4vw, 48px);
+  background: $color-white;
+}
+
+.container {
+  max-width: 960px;
+  width: 100%;
+  font-family: $font-family-base;
+  color: $color-black;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  background: $color-white;
+  padding: clamp(24px, 4vw, 40px);
+}
+
+.title {
+  font-size: $font-size-32;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.updated {
+  font-size: $font-size-14;
+  color: $color-text-secondary;
+  margin-bottom: 24px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  column-gap: 12px;
+  margin-bottom: 16px;
+}
+
+.logo {
+  width: 64px;
+  height: 61px;
+}
+
+.sectionTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 24px 0 8px 0;
+}
+
+.paragraph {
+  font-size: $font-size-14;
+  line-height: 1.7;
+  margin: 0 0 12px 0;
+}
+
+.list {
+  margin: 0 0 12px 18px;
+  font-size: $font-size-14;
+  line-height: 1.7;
+}
+
+.backRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 32px;
+}
+
+.backLink {
+  color: $color-orange;
+  font-weight: 700;
+}

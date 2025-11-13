@@ -1,0 +1,94 @@
+@use "../../styles/tokens.scss" as *;
+
+.root {
+  display: grid;
+  grid-template-rows: auto auto;
+  row-gap: 12px;
+  color: $color-gray-300;
+  font-family: $font-family-base;
+  --tc-line-height: clamp(24px, 3.6vw, 32px);
+  --tc-transition: 400ms;
+}
+
+.viewport {
+  position: relative;
+  height: auto;
+  width: 100%;
+  transition: height 200ms ease;
+  padding-bottom: 6px;
+  min-height: calc(var(--tc-line-height) * 2 + 8px);
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 400ms ease, transform 400ms ease;
+  will-change: opacity, transform;
+  white-space: normal;
+  line-height: var(--tc-line-height);
+  font-size: clamp(16px, 2.2vw, $font-size-24);
+  max-width: clamp(480px, 70vw, 1100px);
+  hyphens: auto;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.dots {
+  display: flex;
+  column-gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(180, 180, 180, 0.6);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 200ms ease, transform 200ms ease, box-shadow 200ms ease;
+}
+
+.dot:hover { background: rgba(180, 180, 180, 0.85); }
+.dot:focus-visible { outline: none; box-shadow: 0 0 0 2px $color-orange; }
+.dotActive { background: $color-orange; transform: scale(1.15); box-shadow: 0 0 0 2px rgba(255, 119, 45, 0.25); }
+
+/* arrows removed for subtle navigation */
+
+.message {
+  opacity: 0;
+  transition: opacity var(--tc-transition) ease-in-out;
+  will-change: opacity;
+  line-height: var(--tc-line-height);
+  font-size: clamp(16px, 2.2vw, $font-size-24);
+  max-width: clamp(480px, 70vw, 1100px);
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.show { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .message { transition: none; }
+}

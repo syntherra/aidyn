@@ -1,0 +1,200 @@
+@use "../../styles/tokens.scss" as *;
+
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: clamp(8px, 2vw, 10px);
+  border-radius: $radius-lg;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(440px, 720px);
+  column-gap: clamp(16px, 3vw, 32px);
+  border-radius: $radius-lg;
+  background: $color-white;
+  padding: clamp(24px, 4vw, $spacing-50);
+  width: 100%;
+}
+
+.left {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  row-gap: clamp(16px, 3vh, 32px);
+  min-width: 0;
+  max-height: 100%;
+  overflow: hidden;
+  padding-right: 80px;
+}
+
+.logo {
+  width: 64px;
+  height: 61px;
+  justify-self: start;
+  align-self: start;
+}
+
+.graphic {
+  width: clamp(240px, 40vw, 701px);
+  max-width: 100%;
+  height: clamp(180px, 35vh, 480px);
+  object-fit: contain;
+  justify-self: center;
+  align-self: center;
+}
+
+.tagline {
+  font-family: $font-family-base;
+  font-size: clamp(18px, 2.2vw, $font-size-24);
+  color: $color-gray-300;
+  text-transform: uppercase;
+  line-height: clamp(28px, 3.2vw, 42px);
+  word-break: break-word;
+}
+
+.dots {
+  display: flex;
+  column-gap: 10px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: $radius-pill;
+  background: $color-gray-300;
+}
+
+.dotActive {
+  background: $color-orange;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  background: $color-white;
+  padding: clamp(24px, 4vw, $spacing-50) clamp(32px, 6vw, $spacing-90);
+  row-gap: clamp(8px, 1.5vw, 10px);
+  min-width: 0;
+  width: 100%;
+}
+
+.title {
+  font-family: $font-family-base;
+  font-size: clamp(24px, 3vw, $font-size-32);
+  font-weight: 700;
+  color: $color-black;
+  margin: 0;
+}
+
+.subtitle {
+  font-family: $font-family-base;
+  font-size: clamp(13px, 1.8vw, $font-size-14);
+  color: $color-black;
+  margin: 0;
+  font-weight: 400;
+}
+
+.dividerThin {
+  height: 4px;
+  width: 100%;
+  background: $color-white;
+}
+
+.privacy {
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+  font-weight: 400;
+}
+
+.privacyLink {
+  color: $color-orange;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dividerWide {
+  height: 20px;
+  width: 100%;
+  background: $color-white;
+}
+
+.orRow {
+  display: flex;
+  align-items: center;
+  column-gap: 10px;
+}
+
+.line {
+  flex: 1;
+  height: 1px;
+  background: $color-gray-200;
+}
+
+.orText {
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+  font-weight: 400;
+}
+
+.oauthRow {
+  display: flex;
+  column-gap: 10px;
+  align-items: stretch;
+}
+
+.oauthRow > * {
+  flex: 1;
+  min-width: 0;
+}
+
+.footerText {
+  text-align: center;
+  font-size: $font-size-14;
+  margin-top: 10px;
+  font-family: $font-family-base;
+  font-weight: 400;
+}
+
+.signInLink {
+  color: $color-orange;
+  font-weight: 700;
+}
+
+@media (max-width: 1024px) {
+  .container { grid-template-columns: 1fr; row-gap: 24px; }
+  .graphic { width: clamp(240px, 60vw, 701px); height: auto; }
+}
+
+@media (max-width: 640px) {
+  .card { padding: 24px; }
+  .subtitle { line-height: 17px; }
+}
+
+@media (max-height: 700px) {
+  .graphic { height: clamp(160px, 30vh, 360px); }
+  .tagline { font-size: clamp(16px, 2vw, 20px); line-height: clamp(24px, 3vw, 32px); }
+}
+.bottom {
+  justify-self: start;
+  align-self: end;
+  width: 100%;
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  row-gap: 0;
+  margin-bottom: 34px;
+}
