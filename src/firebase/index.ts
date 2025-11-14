@@ -184,12 +184,23 @@ export const setActiveSession = async (userId: string, sessionId: string) => {
 
 export const appendSessionMessage = async (sessionId: string, entry: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }) => {
   initFirebase(); if (!db) return
-  try { await addDoc(collection(db, 'onboarding_sessions', sessionId, 'messages'), entry) } catch (e) { /* suppressed */ }
+  try { await addDoc(collection(db, 'onboarding_sessions', sessionId, 'messages'), { ...entry, createdAt: serverTimestamp() }) } catch (e) { /* suppressed */ }
 }
 
 export const observeSessionMessages = (sessionId: string, cb: (items: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }[]) => void) => {
   initFirebase(); if (!db) { cb([]); return () => {} }
-  const q = query(collection(db, 'onboarding_sessions', sessionId, 'messages'), orderBy('ts', 'asc'))
+  const q = query(collection(db, 'onboarding_sessions', sessionId, 'messages'), orderBy('createdAt', 'asc'))
+  return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data() as any)))
+}
+
+export const appendUserMessage = async (userId: string, entry: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }) => {
+  initFirebase(); if (!db) return
+  try { await addDoc(collection(db, 'onboarding', userId, 'messages'), { ...entry, createdAt: serverTimestamp() }) } catch (e) { await logApp('error', 'user_message_append_failed', userId, 'onboarding') }
+}
+
+export const observeUserMessages = (userId: string, cb: (items: { role: 'user' | 'assistant'; text: string; stage?: string; ts: string }[]) => void) => {
+  initFirebase(); if (!db) { cb([]); return () => {} }
+  const q = query(collection(db, 'onboarding', userId, 'messages'), orderBy('createdAt', 'asc'))
   return onSnapshot(q, (snap) => cb(snap.docs.map(d => d.data() as any)))
 }
 export const setAuthPersistenceMode = async (remember: boolean) => {

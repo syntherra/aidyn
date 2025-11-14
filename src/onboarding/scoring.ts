@@ -26,15 +26,20 @@ export function evaluateAnswer(stage: StageKey, text: string) {
   const lc = text.toLowerCase();
   const kws = KEYWORDS[stage];
   let relevance = 0;
-  for (const k of kws) if (lc.includes(k)) relevance += 12;
+  let hits = 0;
+  for (const k of kws) {
+    if (lc.includes(k)) { relevance += 12; hits += 1 }
+  }
   const spec = specificityScore(text);
   let deductions = 0;
   if (lc.length < 12) deductions += 5;
   if (/http:\/\/|https:\/\//.test(lc)) deductions += 5;
   const delta = Math.max(0, relevance + spec - deductions);
-  let normalized = Math.min(100, Math.round(delta / 1.3));
-  // Ensure a positive bump for any reasonable answer
-  if (wordCount(text) >= 3 && normalized < 10) normalized = 10;
+  let normalized = Math.min(100, Math.round(delta / 1.2));
+  if (hits >= 2) normalized = Math.min(100, normalized + 15);
+  // Quality gate: require either sufficient keywords or specificity
+  const qualityOk = hits >= 2 || spec >= 20;
+  if (!qualityOk) normalized = 0;
   const flags = [] as string[];
   if (normalized < 30) flags.push("low_relevance");
   if (spec < 15) flags.push("low_specificity");

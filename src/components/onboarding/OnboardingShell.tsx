@@ -3,7 +3,7 @@ import styles from "./OnboardingShell.module.scss";
 import Button from "../ui/Button";
 import { streamChat, chatOnce } from "../../ai/deepseek";
 import { evaluateAnswer, nextPrompt } from "../../onboarding/scoring";
-import { updateOnboarding, logApp, updateOnboardingStage, startOnboardingSession, setActiveSession, observeSessionMessages, appendSessionMessage } from "../../firebase";
+import { updateOnboarding, logApp, updateOnboardingStage, startOnboardingSession, setActiveSession, observeSessionMessages, appendSessionMessage, observeUserMessages, appendUserMessage, doSignOut } from "../../firebase";
 
 type StageKey = "identity" | "product" | "audience" | "positioning" | "sales" | "voice";
 const STAGES: StageKey[] = ["identity", "product", "audience", "positioning", "sales", "voice"];
@@ -24,6 +24,7 @@ const OnboardingShell = ({ userId, onboarding }: { userId?: string, onboarding?:
     { role: "assistant", text: "Welcome to AIDYN. Let’s start with your Business Identity. Tell me your company name, industry and core values." },
   ]);
   const [sessionId, setSessionId] = useState<string | null>(null);
+  const [migrated, setMigrated] = useState<boolean>(false);
   const [progress, setProgress] = useState<Record<StageKey, number>>({ identity: 0, product: 0, audience: 0, positioning: 0, sales: 0, voice: 0 });
   const [score, setScore] = useState<number>(0);
   const overall = useMemo(() => Math.round(Object.values(progress).reduce((a, b) => a + b, 0) / STAGES.length), [progress]);
@@ -54,22 +55,46 @@ const OnboardingShell = ({ userId, onboarding }: { userId?: string, onboarding?:
   }, [onboarding, userId]);
 
   useEffect(() => {
-    if (!sessionId) return;
-    const off = observeSessionMessages(sessionId, (items) => {
-      if (items && items.length) setHistory(items.map(m => ({ role: m.role, text: m.text })));
+    if (!userId) return;
+    const off = observeUserMessages(userId, (items) => {
+      if (items && items.length) {
+        setHistory(items.map(m => ({ role: m.role, text: m.text })));
+      } else {
+        const conv = onboarding?.conversation as { role: "user" | "assistant"; text: string }[] | undefined;
+        if (Array.isArray(conv) && conv.length) setHistory(conv);
+      }
     });
     return () => off();
-  }, [sessionId]);
+  }, [userId]);
+
+  useEffect(() => {
+    if (!sessionId || migrated) return;
+    const legacy = onboarding?.conversation as { role: "user" | "assistant"; text: string; stage?: StageKey; ts?: string }[] | undefined;
+    if (Array.isArray(legacy) && legacy.length) {
+      (async () => {
+        for (let i = 0; i < legacy.length; i++) {
+          const e = legacy[i];
+          const ts = e.ts || new Date(Date.now() + i).toISOString();
+          await appendSessionMessage(sessionId, { role: e.role, text: e.text, stage: e.stage, ts })
+          if (userId) await appendUserMessage(userId, { role: e.role, text: e.text, stage: e.stage, ts })
+        }
+        setMigrated(true);
+        if (userId) updateOnboarding(userId, { legacyMigrated: true });
+      })();
+    }
+  }, [sessionId, migrated, onboarding]);
 
   const send = () => {
     if (!message.trim()) return;
     const timestamp = new Date().toISOString();
     setHistory((h) => [...h, { role: "user", text: message }]);
+    if (userId) appendUserMessage(userId, { role: 'user', text: message, stage, ts: timestamp });
     if (sessionId) appendSessionMessage(sessionId, { role: 'user', text: message, stage, ts: timestamp });
     const evalRes = evaluateAnswer(stage, message);
-    const newScore = Math.max(0, Math.min(100, score + evalRes.relevance - evalRes.deductions + Math.round(evalRes.specificity / 5)));
+    const newScore = Math.max(0, Math.min(100, score + evalRes.relevance - evalRes.deductions + Math.round(evalRes.specificity / 4)));
     setScore(newScore);
-    const bump = Math.min(100, (progress[stage] || 0) + Math.min(30, evalRes.progressDelta));
+    const inc = Math.min(40, evalRes.progressDelta);
+    const bump = Math.min(100, (progress[stage] || 0) + inc);
     setProgress((p) => ({ ...p, [stage]: bump }));
     if (userId) updateOnboardingStage(userId, stage, bump, message, newScore);
     logApp('info', 'onboarding_message', userId || undefined, 'onboarding');
@@ -103,6 +128,7 @@ Keep responses concise and actionable. Encourage specificity. If off-topic, gent
             setHistory((h) => [...h, { role: 'assistant', text: reply }])
           }
         }
+        if (userId && buffer.trim()) appendUserMessage(userId, { role: 'assistant', text: buffer.trim(), stage, ts: new Date().toISOString() })
         if (sessionId && buffer.trim()) appendSessionMessage(sessionId, { role: 'assistant', text: buffer.trim(), stage, ts: new Date().toISOString() })
         if (bump >= 75) {
           const nextIdx = STAGES.indexOf(stage) + 1;
@@ -142,7 +168,6 @@ Keep responses concise and actionable. Encourage specificity. If off-topic, gent
       <div className={styles.panel}>
         <div className={styles.kpis}>
           <div className={styles.kpiCard}><strong>Overall</strong><div>{overall}%</div></div>
-          <div className={styles.kpiCard}><strong>Score</strong><div>{score}</div></div>
           <div className={styles.kpiCard}><strong>Status</strong><div>{overall >= 80 ? "Ready" : "In progress"}</div></div>
         </div>
         {STAGES.map((key) => (
@@ -164,6 +189,7 @@ Keep responses concise and actionable. Encourage specificity. If off-topic, gent
               logApp('info', 'onboarding_cleared', userId || undefined, 'onboarding');
             }
           }}>Clear Data</Button>
+          <Button variant="neutral" ariaLabel="Log Out" onClick={() => { doSignOut() }}>Log Out</Button>
         </div>
       </div>
     </div>

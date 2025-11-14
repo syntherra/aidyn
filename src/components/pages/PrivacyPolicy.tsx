@@ -7,7 +7,7 @@ const PrivacyPolicy = () => {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <img src="/assets/Vector.svg" alt="AIDYN logo" className={styles.logo} />
+          <img src="/assets/aidyn-logo.svg" alt="AIDYN logo" className={styles.logo} />
           <h1 className={styles.title}>Privacy Policy</h1>
         </div>
         <p className={styles.updated}>Last Updated: November 13, 2025</p>

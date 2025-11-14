@@ -72,7 +72,7 @@ const SignUpPage = () => {
     <div className={styles.page}>
       <div className={styles.container}>
         <div className={styles.left}>
-          <img className={styles.logo} src="/assets/Vector.svg" alt="AIDYN logo" />
+          <img className={styles.logo} src="/assets/aidyn-logo.svg" alt="AIDYN logo" />
           <img className={styles.graphic} src="/assets/Group 200.svg" alt="Geometric graphic" />
           <div className={styles.bottom}>
             <TextCarousel
