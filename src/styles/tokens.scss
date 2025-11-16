@@ -1,17 +1,17 @@
-$color-black: #000000;
-$color-text-secondary: #00000066;
-$color-gray-100: #f4f4f4;
-$color-gray-200: #bbbbbb;
-$color-gray-300: #b4b4b4;
-$color-white: #ffffff;
-$color-orange: #ff772d;
-$color-green: #2ecc71;
+$color-black: var(--text-primary);
+$color-text-secondary: var(--text-secondary);
+$color-gray-100: var(--surface-2);
+$color-gray-200: var(--divider);
+$color-gray-300: var(--text-secondary);
+$color-white: var(--surface);
+$color-orange: var(--accent);
+$color-green: var(--success);
 
 $radius-lg: 16px;
 $radius-md: 8px;
 $radius-pill: 99px;
 
-$shadow-card: 0px 0px 50px 0px #0000001a;
+$shadow-card: 0px 0px 50px 0px var(--shadow-color);
 
 $font-family-base: Inter, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", SimHei, Arial, Helvetica, sans-serif;
 $font-size-32: 32px;

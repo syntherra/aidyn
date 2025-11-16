@@ -4,7 +4,7 @@
   display: flex;
   justify-content: center;
   padding: clamp(16px, 4vw, 48px);
-  background: $color-white;
+  background: var(--bg);
 }
 
 .container {

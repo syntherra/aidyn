@@ -16,9 +16,13 @@
   justify-content: center;
 }
 
+.checked {
+  background: $color-orange;
+  color: var(--accent-contrast);
+}
+
 .label {
   font-family: $font-family-base;
   font-size: $font-size-14;
   color: $color-black;
 }
-

@@ -19,11 +19,10 @@ const Checkbox = ({ id, checked, onChange, label }: Props) => {
         aria-checked={checked}
         style={{ position: "absolute", opacity: 0, pointerEvents: "none" }}
       />
-      <span className={styles.box}>{checked ? "✓" : ""}</span>
+      <span className={`${styles.box} ${checked ? styles.checked : ''}`}>{checked ? "✓" : ""}</span>
       <span className={styles.label}>{label}</span>
     </label>
   );
 };
 
 export default Checkbox;
-

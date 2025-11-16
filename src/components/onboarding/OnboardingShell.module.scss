@@ -6,6 +6,7 @@
   column-gap: clamp(12px, 2vw, 24px);
   width: 100%;
   min-height: 70vh;
+  background: var(--bg);
 }
 
 .panel {
@@ -80,4 +81,3 @@
 @media (max-width: 900px) {
   .shell { grid-template-columns: 1fr; row-gap: 16px; }
 }
-

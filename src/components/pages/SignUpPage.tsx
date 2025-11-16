@@ -73,7 +73,16 @@ const SignUpPage = () => {
       <div className={styles.container}>
         <div className={styles.left}>
           <img className={styles.logo} src="/assets/aidyn-logo.svg" alt="AIDYN logo" />
-          <img className={styles.graphic} src="/assets/Group 200.svg" alt="Geometric graphic" />
+          <lottie-player
+            className={styles.graphic}
+            src="/animation/aidyn-animation.json"
+            background="transparent"
+            speed="1"
+            loop
+            autoplay
+            renderer="svg"
+            aria-label="AIDYN animation"
+          ></lottie-player>
           <div className={styles.bottom}>
             <TextCarousel
               messages={[

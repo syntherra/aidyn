@@ -19,7 +19,7 @@
 .root:hover {
   transform: translateY(-1px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-  background: #efefef;
+  background: $color-gray-100;
 }
 
 .root:active {

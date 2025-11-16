@@ -10,6 +10,7 @@
   min-height: 100vh;
   overflow-x: hidden;
   padding: clamp(16px, 3vw, 24px);
+  background: var(--bg);
 }
 
 .container {
@@ -17,7 +18,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(440px, 720px);
   column-gap: clamp(16px, 3vw, 32px);
   border-radius: $radius-lg;
-  background: $color-white;
+  background: transparent;
   padding: clamp(24px, 4vw, $spacing-50);
   width: 100%;
 }
@@ -111,6 +112,7 @@
   font-family: $font-family-base;
   font-size: $font-size-14;
   font-weight: 400;
+  color: $color-black;
 }
 
 .privacyLink {
@@ -147,6 +149,7 @@
   font-family: $font-family-base;
   font-size: $font-size-14;
   font-weight: 400;
+  color: $color-black;
 }
 
 .oauthRow {
@@ -166,6 +169,7 @@
   margin-top: 10px;
   font-family: $font-family-base;
   font-weight: 400;
+  color: $color-black;
 }
 
 .signInLink {

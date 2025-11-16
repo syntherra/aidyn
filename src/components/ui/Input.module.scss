@@ -49,9 +49,9 @@
 .errorText {
   font-family: $font-family-base;
   font-size: $font-size-14;
-  color: #d32f2f;
+  color: var(--error);
 }
 
 .error {
-  box-shadow: inset 0 0 0 2px #d32f2f;
+  box-shadow: inset 0 0 0 2px var(--error);
 }
