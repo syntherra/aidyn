@@ -1,6 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import styles from "./OnboardingShell.module.scss";
 import Button from "../ui/Button";
+import Input from "../ui/Input";
+import ProgressDashboard from "./ProgressDashboard";
+import { Mic, Paperclip, Send } from "lucide-react";
 import { streamChat, chatOnce } from "../../ai/deepseek";
 import { evaluateAnswer, nextPrompt } from "../../onboarding/scoring";
 import { updateOnboarding, logApp, updateOnboardingStage, startOnboardingSession, setActiveSession, observeSessionMessages, appendSessionMessage, observeUserMessages, appendUserMessage, doSignOut } from "../../firebase";
@@ -28,6 +31,7 @@ const OnboardingShell = ({ userId, onboarding }: { userId?: string, onboarding?:
   const [progress, setProgress] = useState<Record<StageKey, number>>({ identity: 0, product: 0, audience: 0, positioning: 0, sales: 0, voice: 0 });
   const [score, setScore] = useState<number>(0);
   const overall = useMemo(() => Math.round(Object.values(progress).reduce((a, b) => a + b, 0) / STAGES.length), [progress]);
+  const [profileOpen, setProfileOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (onboarding?.progress) {
@@ -149,47 +153,88 @@ Keep responses concise and actionable. Encourage specificity. If off-topic, gent
     setMessage("");
   };
 
+  const avatarLetter = (onboarding?.user?.name || "S").slice(0, 1).toUpperCase();
+
   return (
     <div className={styles.shell}>
       <div className={styles.panel}>
-        <div className={styles.leftTitle}>{LABELS[stage]}</div>
+        <div className={styles.leftHeader}>
+          <div className={styles.leftTitle}>In order to ensure best performance in the future, please make sure you provide Aidyn with as much details as possible</div>
+        </div>
+        <div className={styles.divider} />
         <div className={styles.chatArea}>
-          <div className={styles.messages}>
+          <div className={styles.messages} aria-live="polite">
             {history.map((m, i) => (
-              <p key={i} aria-live="polite"><strong>{m.role === "assistant" ? "AIDYN" : "You"}:</strong> {m.text}</p>
+              <div key={i} className={`${styles.bubble} ${m.role === "user" ? styles.fromUser : styles.fromAi}`}>{m.text}</div>
             ))}
           </div>
-          <div className={styles.inputRow}>
-            <input className={styles.input} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Type your answer" aria-label="Answer" />
-            <Button variant="neutral" ariaLabel="Send" onClick={send}>Send</Button>
+          <div className={styles.inputRow} role="group" aria-label="Compose answer">
+            <div className={styles.input}>
+              <Input id="onboarding-answer" value={message} onChange={setMessage} placeholder="..." ariaLabel="Answer" />
+            </div>
+            <div className={styles.actions}>
+              <button type="button" className={styles.actionBtn} aria-label="Attach file"><Paperclip size={18} /></button>
+              <button type="button" className={styles.actionBtn} aria-label="Voice input"><Mic size={18} /></button>
+              <button type="button" className={`${styles.actionBtn} ${styles.sendBtn}`} aria-label="Send" onClick={send}><Send size={18} /></button>
+            </div>
           </div>
+          <div className={styles.leftTitle}>* Your data can be used for AI engine training purposes.</div>
         </div>
       </div>
       <div className={styles.panel}>
-        <div className={styles.kpis}>
-          <div className={styles.kpiCard}><strong>Overall</strong><div>{overall}%</div></div>
-          <div className={styles.kpiCard}><strong>Status</strong><div>{overall >= 80 ? "Ready" : "In progress"}</div></div>
-        </div>
-        {STAGES.map((key) => (
-          <div key={key} className={styles.progressGroup}>
-            <div>{LABELS[key]}</div>
-            <div className={styles.bar}>
-              <div className={styles.fill} style={{ width: `${progress[key]}%` }} />
+        <div className={styles.profile}>
+          <button
+            type="button"
+            className={styles.avatar}
+            aria-label="Profile"
+            aria-haspopup="menu"
+            aria-expanded={profileOpen}
+            onClick={() => setProfileOpen((v) => !v)}
+          >
+            {avatarLetter}
+          </button>
+          {profileOpen ? (
+            <div className={styles.menu} role="menu" aria-label="Profile menu">
+              <button
+                type="button"
+                className={styles.menuItem}
+                role="menuitem"
+                onClick={() => { setProfileOpen(false); doSignOut(); }}
+              >
+                Log Out
+              </button>
+              <button
+                type="button"
+                className={styles.menuItem}
+                role="menuitem"
+                onClick={() => {
+                  setProfileOpen(false);
+                  if (confirm('This will erase your onboarding data. Continue?')) {
+                    updateOnboarding(userId || '', { progress: {}, steps: {}, completion: false })
+                    setProgress({ identity: 0, product: 0, audience: 0, positioning: 0, sales: 0, voice: 0 });
+                    setScore(0);
+                    setStage('identity');
+                    setHistory([{ role: 'assistant', text: 'Data cleared. Let’s restart with your Business Identity.' }]);
+                    logApp('info', 'onboarding_cleared', userId || undefined, 'onboarding');
+                  }
+                }}
+              >
+                Clear Data
+              </button>
             </div>
-          </div>
-        ))}
-        <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-          <Button variant="neutral" ariaLabel="Clear Data" onClick={() => {
-            if (confirm('This will erase your onboarding data. Continue?')) {
-              updateOnboarding(userId || '', { progress: {}, steps: {}, completion: false })
-              setProgress({ identity: 0, product: 0, audience: 0, positioning: 0, sales: 0, voice: 0 });
-              setScore(0);
-              setStage('identity');
-              setHistory([{ role: 'assistant', text: 'Data cleared. Let’s restart with your Business Identity.' }]);
-              logApp('info', 'onboarding_cleared', userId || undefined, 'onboarding');
-            }
-          }}>Clear Data</Button>
-          <Button variant="neutral" ariaLabel="Log Out" onClick={() => { doSignOut() }}>Log Out</Button>
+          ) : null}
+        </div>
+        <div className={styles.chartWrap}>
+          <ProgressDashboard
+            overall={overall}
+            categories={[
+              { label: "Business Identity", color: "var(--success)", value: progress.identity },
+              { label: "Product or Service Understanding", color: "var(--warning)", value: progress.product },
+              { label: "Target Audience", color: "var(--accent)", value: progress.audience },
+              { label: "Market Positioning", color: "#ff8d28", value: progress.positioning },
+              { label: "Sales Objectives & Brand Voice", color: "#ff383c", value: Math.round((progress.sales + progress.voice) / 2) },
+            ]}
+          />
         </div>
       </div>
     </div>

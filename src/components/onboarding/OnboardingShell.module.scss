@@ -2,49 +2,143 @@
 
 .shell {
   display: grid;
-  grid-template-columns: 40% 60%;
-  column-gap: clamp(12px, 2vw, 24px);
+  grid-template-columns: 45% 55%;
+  grid-template-rows: 1fr;
+  column-gap: $space-24;
   width: 100%;
-  min-height: 70vh;
+  height: 100vh;
   background: var(--bg);
+  padding: $space-24;
+  align-items: stretch;
 }
 
 .panel {
   border-radius: $radius-lg;
   box-shadow: $shadow-card;
   background: $color-white;
-  padding: clamp(16px, 3vw, 24px);
+  padding: $space-24;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.leftHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .leftTitle {
   font-family: $font-family-base;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: $font-size-14;
+  color: var(--muted);
 }
+
+.avatar {
+  width: $space-48;
+  height: $space-48;
+  border-radius: 999px;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-gray-100;
+  color: var(--text-primary);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile { position: absolute; top: $space-16; right: $space-16; }
+
+.menu {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  background: $color-white;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: 8px;
+  min-width: 180px;
+  display: grid;
+  row-gap: 4px;
+}
+
+.menuItem {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-start;
+  column-gap: 10px;
+  height: $space-48;
+  border-radius: $radius-md;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+}
+
+.menuItem:hover { background: $color-gray-100; }
+
+.divider { height: 1px; background: $color-gray-100; margin: $space-8 0 $space-24; }
 
 .chatArea {
   display: flex;
   flex-direction: column;
-  row-gap: 12px;
+  row-gap: $space-16;
   height: 100%;
+  flex: 1;
 }
 
 .messages {
   flex: 1;
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  row-gap: $space-16;
 }
+
+.bubble {
+  max-width: 85%;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  padding: $space-16;
+  color: var(--text-primary);
+  font-family: $font-family-base;
+  font-size: $font-size-14;
+  letter-spacing: 0;
+  transform: translateY(6px);
+  opacity: 0;
+  animation: in 220ms ease forwards;
+}
+
+.fromUser { background: $color-orange; align-self: flex-start; }
+.fromAi { background: $color-gray-100; align-self: flex-start; }
+
+@keyframes in { to { transform: translateY(0); opacity: 1; } }
 
 .inputRow {
   display: flex;
-  column-gap: 8px;
+  align-items: center;
+  column-gap: $space-8;
 }
 
-.input {
-  flex: 1;
-  border-radius: $radius-md;
-  border: 1px solid $color-gray-200;
-  padding: 10px 12px;
+.input { flex: 1; }
+.actions { display: inline-flex; align-items: center; column-gap: $space-8; }
+
+.actionBtn {
+  width: $space-48;
+  height: $space-48;
+  border-radius: $radius-pill;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: $color-gray-100;
+  color: var(--text-primary);
+  transition: transform 120ms ease, box-shadow 120ms ease;
 }
+
+.actionBtn:hover { transform: translateY(-1px); box-shadow: $shadow-card; }
+.sendBtn { background: $color-orange; color: var(--accent-contrast); }
 
 .progressGroup {
   display: grid;
@@ -65,19 +159,26 @@
   border-radius: $radius-md;
 }
 
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 12px;
-  row-gap: 12px;
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.kpiCard {
-  background: $color-gray-100;
-  border-radius: $radius-md;
-  padding: 12px;
-}
+.kpis { display: none; }
 
-@media (max-width: 900px) {
-  .shell { grid-template-columns: 1fr; row-gap: 16px; }
+.kpiCard { display: none; }
+
+.chartWrap { display: flex; flex-direction: column; align-items: center; justify-content: center; row-gap: $space-16; }
+
+.legendWrap { margin-top: $space-16; }
+
+@media (max-width: 1024px) {
+  .shell { grid-template-columns: 1fr; grid-template-rows: auto auto; row-gap: $space-24; height: 100vh; }
 }

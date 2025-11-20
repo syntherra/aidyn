@@ -1,0 +1,77 @@
+@use "../../styles/tokens.scss" as *;
+
+.wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.svg {
+  display: block;
+}
+
+.centerLabel {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-family: $font-family-base;
+  flex-direction: column;
+}
+
+.centerValue {
+  color: var(--text-primary);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 32px;
+}
+
+.centerTitle {
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: 0.5px;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 22px;
+}
+
+.legendItem {
+  display: inline-flex;
+  align-items: center;
+  column-gap: 6px;
+  color: var(--text-primary);
+  font-family: Lato, $font-family-base;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.green { background: var(--success); }
+.yellow { background: var(--warning); }
+.orange { background: var(--accent); }
+.red { background: #ff383c; }
+
+.ring {
+  transition: stroke-dashoffset 600ms ease, stroke 200ms ease, opacity 200ms ease;
+}
+
+.track {
+  transition: stroke 200ms ease;
+}
+
+.endpoint {
+  transition: transform 200ms ease;
+}
+
+.inactive { opacity: 0.35; }
